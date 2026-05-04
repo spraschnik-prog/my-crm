@@ -6,15 +6,16 @@ import { ArrowLeft, Pencil } from 'lucide-react'
 import DownloadPdfButton from './DownloadPdfButton'
 import StatusUpdater from '../../quotes/[id]/StatusUpdater'
 import RecordPaymentForm from './RecordPaymentForm'
+import SendEmailButton from '@/components/SendEmailButton'
+import Attachments from '@/components/Attachments'
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: invoice } = await supabase
-    .from('invoices')
-    .select('*, clients(*), invoice_items(*)')
-    .eq('id', id)
-    .single()
+  const [{ data: invoice }, { data: attachments }] = await Promise.all([
+    supabase.from('invoices').select('*, clients(*), invoice_items(*)').eq('id', id).single(),
+    supabase.from('attachments').select('*').eq('entity_type', 'invoice').eq('entity_id', id).order('created_at'),
+  ])
 
   if (!invoice) notFound()
 
@@ -33,6 +34,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         </div>
         <div className="flex items-center gap-2">
           <DownloadPdfButton invoice={invoice} />
+          <SendEmailButton type="invoice" id={id} clientEmail={invoice.clients?.email} />
           {invoice.status !== 'paid' && (
             <Link href={`/invoices/${id}/edit`} className="inline-flex items-center gap-1.5 text-sm font-medium border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50">
               <Pencil className="w-3.5 h-3.5" /> Edit
@@ -103,6 +105,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               <RecordPaymentForm id={id} balance={balance} />
             </div>
           )}
+          <Attachments entityType="invoice" entityId={id} initialAttachments={attachments ?? []} />
         </div>
       </div>
     </div>

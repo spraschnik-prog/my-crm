@@ -2,19 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate, formatCurrency, statusColor } from '@/lib/utils'
-import { ArrowLeft, Pencil, Download, FileText } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 import DownloadPdfButton from './DownloadPdfButton'
 import StatusUpdater from './StatusUpdater'
 import ConvertToInvoiceButton from './ConvertToInvoiceButton'
+import SendEmailButton from '@/components/SendEmailButton'
+import Attachments from '@/components/Attachments'
 
 export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: quote } = await supabase
-    .from('quotes')
-    .select('*, clients(*), quote_items(*)')
-    .eq('id', id)
-    .single()
+  const [{ data: quote }, { data: attachments }] = await Promise.all([
+    supabase.from('quotes').select('*, clients(*), quote_items(*)').eq('id', id).single(),
+    supabase.from('attachments').select('*').eq('entity_type', 'quote').eq('entity_id', id).order('created_at'),
+  ])
 
   if (!quote) notFound()
 
@@ -31,6 +32,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         </div>
         <div className="flex items-center gap-2">
           <DownloadPdfButton quote={quote} />
+          <SendEmailButton type="quote" id={id} clientEmail={quote.clients?.email} />
           {quote.status !== 'accepted' && (
             <Link href={`/quotes/${id}/edit`} className="inline-flex items-center gap-1.5 text-sm font-medium border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50">
               <Pencil className="w-3.5 h-3.5" /> Edit
@@ -95,6 +97,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             <h2 className="font-semibold text-slate-900 mb-3 text-sm">Update Status</h2>
             <StatusUpdater id={id} currentStatus={quote.status} type="quote" />
           </div>
+          <Attachments entityType="quote" entityId={id} initialAttachments={attachments ?? []} />
         </div>
       </div>
     </div>

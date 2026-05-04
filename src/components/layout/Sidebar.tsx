@@ -6,19 +6,20 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Package, FileText,
   Receipt, LogOut, Building2, TrendingUp,
-  Calendar, CreditCard, DollarSign,
+  Calendar, CreditCard, DollarSign, Settings,
 } from 'lucide-react'
 
 const nav = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/clients',   label: 'Clients',   icon: Users },
-  { href: '/leads',     label: 'Leads',     icon: TrendingUp },
-  { href: '/schedule',  label: 'Schedule',  icon: Calendar },
-  { href: '/products',  label: 'Products',  icon: Package },
-  { href: '/quotes',    label: 'Quotes',    icon: FileText },
-  { href: '/invoices',  label: 'Invoices',  icon: Receipt },
-  { href: '/payments',  label: 'Payments',  icon: DollarSign },
-  { href: '/expenses',  label: 'Expenses',  icon: CreditCard },
+  { href: '/dashboard',    label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/clients',      label: 'Clients',   icon: Users },
+  { href: '/leads',        label: 'Leads',     icon: TrendingUp },
+  { href: '/schedule',     label: 'Schedule',  icon: Calendar },
+  { href: '/products',     label: 'Products',  icon: Package },
+  { href: '/quotes',       label: 'Quotes',    icon: FileText },
+  { href: '/invoices',     label: 'Invoices',  icon: Receipt },
+  { href: '/payments',     label: 'Payments',  icon: DollarSign },
+  { href: '/expenses',     label: 'Expenses',  icon: CreditCard },
+  { href: '/settings/team',label: 'Team',      icon: Settings },
 ]
 
 export default function Sidebar() {
